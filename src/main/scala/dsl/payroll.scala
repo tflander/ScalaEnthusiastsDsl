@@ -9,6 +9,7 @@ import payroll.Employee
 import payroll.Paycheck
 
 object rules {
+  
   def apply(rules: Employee => Paycheck) = new PayrollBuilderRules(rules)
 
   implicit def int2Duration(i: Int) = Duration(i)

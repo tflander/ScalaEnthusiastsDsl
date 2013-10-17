@@ -1,3 +1,9 @@
+Step 2:
+
+Reverted my rogue code
+
+
+
 Step 0:
 
 Pulled code from the book http://www.amazon.com/Programming-Scala-Scalability-Functional-Objects/dp/0596155956/ref=sr_1_4?ie=UTF8&qid=1381962239&sr=8-4&keywords=dean+wampler
