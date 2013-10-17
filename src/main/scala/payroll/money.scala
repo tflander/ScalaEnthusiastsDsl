@@ -38,7 +38,7 @@ class Money(val amount: BigDecimal) {
       String.format("$%.2f", double2Double(amount.doubleValue))
 }
 
-class GrossSalary (amount: BigDecimal) extends Money(amount) {
+case class GrossSalary (override val amount: BigDecimal) extends Money(amount) {
   def biweeklyGross = Money(amount / 26.)
 }
 

@@ -11,8 +11,8 @@ class ApiTest extends FunSpec with ShouldMatchers {
 
   describe("API test") {
     it("should create a payroll report") {
-      val buck = Employee(Name("Buck", "Trends"), new GrossSalary(80000))
-      val jane = Employee(Name("Jane", "Doe"), new GrossSalary(90000))
+      val buck = Employee(Name("Buck", "Trends"), GrossSalary(80000))
+      val jane = Employee(Name("Jane", "Doe"), GrossSalary(90000))
       
       val messages = List(buck, jane).map { implicit employee =>
         implicit val biweeklyGross = employee.annualGrossSalary.biweeklyGross
