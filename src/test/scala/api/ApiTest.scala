@@ -5,22 +5,22 @@ import payroll.Name
 import payroll.Money
 import payroll.Paycheck
 import payroll.api.DeductionsCalculator._
+import payroll.GrossSalary
 
 class ApiTest extends FunSpec with ShouldMatchers {
 
-  describe("") {
-    it("") {
-      val buck = Employee(Name("Buck", "Trends"), Money(80000))
-      val jane = Employee(Name("Jane", "Doe"), Money(90000))
+  describe("API test") {
+    it("should create a payroll report") {
+      val buck = Employee(Name("Buck", "Trends"), new GrossSalary(80000))
+      val jane = Employee(Name("Jane", "Doe"), new GrossSalary(90000))
       
-      val messages = List(buck, jane).map { employee =>
-        // Assume annual is based on 52 weeks.
-        val biweeklyGross = employee.annualGrossSalary / Money(26.)
+      val messages = List(buck, jane).map { implicit employee =>
+        implicit val biweeklyGross = employee.annualGrossSalary.biweeklyGross
 
-        val deductions = federalIncomeTax(employee, biweeklyGross) +
-          stateIncomeTax(employee, biweeklyGross) +
-          insurancePremiums(employee, biweeklyGross) +
-          retirementFundContributions(employee, biweeklyGross)
+        val deductions = federalIncomeTax +
+          stateIncomeTax +
+          insurancePremiums +
+          retirementFundContributions
 
         val check = Paycheck(biweeklyGross, biweeklyGross - deductions, deductions)
 

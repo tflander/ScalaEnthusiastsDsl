@@ -4,11 +4,11 @@ import payroll.Money
 import payroll.Employee
 
 object DeductionsCalculator {
-  def federalIncomeTax(empl: Employee, gross: Money) = gross * .25
+  def federalIncomeTax(implicit gross: Money) = gross * .25
 
-  def stateIncomeTax(empl: Employee, gross: Money) = gross * .05
+  def stateIncomeTax(implicit gross: Money) = gross * .05
 
-  def insurancePremiums(empl: Employee, gross: Money) = Money(500)
+  def insurancePremiums(implicit gross: Money) = Money(500)
 
-  def retirementFundContributions(empl: Employee, gross: Money) = gross * .10
+  def retirementFundContributions(implicit gross: Money) = gross * .10
 }

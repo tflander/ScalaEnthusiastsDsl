@@ -1,5 +1,6 @@
 package dsl
 import org.scalatest._
+import payroll.GrossSalary
 
 class PayrollDslTest extends FunSpec with ShouldMatchers {
 
@@ -19,8 +20,8 @@ val payrollCalculator = rules { employee =>
   }
 }
 
-val buck = Employee(Name("Buck", "Trends"), Money(80000))
-val jane = Employee(Name("Jane", "Doe"), Money(90000))
+val buck = Employee(Name("Buck", "Trends"), new GrossSalary(80000))
+val jane = Employee(Name("Jane", "Doe"), new GrossSalary(90000))
 
 List(buck, jane).foreach { employee =>
   val check = payrollCalculator(employee)

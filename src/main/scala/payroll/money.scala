@@ -38,6 +38,10 @@ class Money(val amount: BigDecimal) {
       String.format("$%.2f", double2Double(amount.doubleValue))
 }
 
+class GrossSalary (amount: BigDecimal) extends Money(amount) {
+  def biweeklyGross = Money(amount / 26.)
+}
+
 object Money {
   def apply(amount: BigDecimal)  = new Money(amount)
   def apply(amount: JBigDecimal) = new Money(scaled(new BigDecimal(amount)))
