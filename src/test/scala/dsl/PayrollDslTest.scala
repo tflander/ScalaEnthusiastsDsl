@@ -1,5 +1,6 @@
 package dsl
 import org.scalatest._
+import payroll.dsl.DeductionCalculator
 
 class PayrollDslTest extends FunSpec with ShouldMatchers with BeforeAndAfter {
 
@@ -9,9 +10,12 @@ class PayrollDslTest extends FunSpec with ShouldMatchers with BeforeAndAfter {
   import payroll.dsl.GrossPayBuilder
   import payroll.dsl.DeductionsBuilder
   import payroll.dsl.DeductionsBuilderDeductionHelper
+  import payroll.Type2Money._
+  import payroll.dsl._
+  import payroll.dsl.rules._
 
   val halfPenny = 0.005
-  val buck = Employee(Name("Buck", "Trends"), Money(80000))
+  val buck = Employee(Name("Buck", "Trends"), 80000)
 
   var grossPayBuilder: GrossPayBuilder = _
   var gross: DeductionsBuilder = _
@@ -21,27 +25,38 @@ class PayrollDslTest extends FunSpec with ShouldMatchers with BeforeAndAfter {
     grossPayBuilder.salary_for(1) // 1 day
     gross = new DeductionsBuilder(grossPayBuilder)
   }
+  
+  describe("Dsl rules") {
+    
+    it("creates a builder from a factor explicitly") {
+      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+    }
+    
+    it("creates a builder from a factor implicitly") {
+      val builder = 10 percent_of gross
+    }
+  }
 
   describe("deductions builder tests") {
 
     it("knows the employee") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+      val builder = 10 percent_of gross
       builder.employee should be(buck)
     }
 
     it("returns itself when calling currency") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+      val builder = 10 percent_of gross
       builder.currency should be theSameInstanceAs (builder)
     }
 
     it("modifies the paycheck when you create a deduction builder that deducts a percent of gross") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+      val builder = 10 percent_of gross
       builder.paycheck.gross.amount.toDouble should be(307.69 plusOrMinus halfPenny)
       builder.paycheck.net.amount.toDouble should be(276.92 plusOrMinus halfPenny)
     }
 
     it("modifies the paycheck when you add a deduction of a set amount") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+      val builder = 10 percent_of gross
       builder.paycheck.gross.amount.toDouble should be(307.69 plusOrMinus halfPenny)
       builder.paycheck.net.amount.toDouble should be(276.92 plusOrMinus halfPenny)
       builder.addDeductions(Money(10.))
@@ -49,14 +64,15 @@ class PayrollDslTest extends FunSpec with ShouldMatchers with BeforeAndAfter {
     }
 
     it("modifies the paycheck when you add a deduction as a percentage of gross") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+      val builder = 10 percent_of gross
       builder.paycheck.net.amount.toDouble should be(276.92 plusOrMinus halfPenny)
       builder.addDeductionsPercentageOfGross(10)
       builder.paycheck.net.amount.toDouble should be(246.15 plusOrMinus halfPenny)
     }
 
     it("applies deduction rules") {
-      val builder = new DeductionsBuilderDeductionHelper(10.) percent_of gross
+
+      val builder = 10. percent_of gross
 
       def deductionRules(builder: DeductionsBuilder) = {
         builder.addDeductionsPercentageOfGross(10)
@@ -66,14 +82,37 @@ class PayrollDslTest extends FunSpec with ShouldMatchers with BeforeAndAfter {
       val paycheck = builder.minus_deductions_for(deductionRules)
       builder.paycheck.net.amount.toDouble should be(246.15 plusOrMinus halfPenny)
     }
+  }
 
+  describe("deduction calculator tests") {
+
+    val builder = 10 percent_of gross
+
+    it("allows you to mark up builders with English") {
+
+      new DeductionCalculator is builder
+      new DeductionCalculator are builder
+
+      federalIncomeTax is builder
+      federalIncomeTax are builder
+
+      stateIncomeTax is builder
+      stateIncomeTax are builder
+
+      insurancePremiums is builder
+      insurancePremiums are builder
+
+      retirementFundContributions is builder
+      retirementFundContributions are builder
+
+      federalIncomeTax is builder
+      federalIncomeTax are builder
+    }
   }
 
   describe("Full DSL test") {
     it("should generate a payroll report") {
 
-      import payroll._
-      import payroll.dsl._
       import payroll.dsl.rules._
 
       val payrollCalculator = rules { employee =>
